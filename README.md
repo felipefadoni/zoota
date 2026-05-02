@@ -1,40 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Zoota (VetPlus)
 
-## Getting Started
+Um Micro SaaS para gestão de clínicas veterinárias, pet shops e profissionais independentes.
 
-First, run the development server:
+## 🚀 Tecnologias Utilizadas
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Este projeto foi desenvolvido com as seguintes tecnologias e ferramentas:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **[Next.js](https://nextjs.org/)** (Pages Router) - Framework React
+- **[React](https://reactjs.org/)** - Biblioteca de interfaces de usuário
+- **[TypeScript](https://www.typescriptlang.org/)** - Tipagem estática
+- **[Material UI (MUI v9)](https://mui.com/)** & **Emotion** - Componentes de interface e estilização
+- **[Recharts](https://recharts.org/)** - Biblioteca para gráficos e visualização de dados
+- **[Axios](https://axios-http.com/)** - Cliente HTTP para chamadas de API
+- **[Biome](https://biomejs.dev/)** - Ferramenta rápida para linting e formatação de código
+- **[Bun](https://bun.sh/)** - Gerenciador de pacotes e runtime principal
+- **[Docker](https://www.docker.com/)** - Containerização da aplicação
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## ⚙️ Funcionalidades do Micro SaaS
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+A plataforma conta com os seguintes módulos e funcionalidades:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+- **Autenticação:** Sistema de login, criação de conta e recuperação de senha.
+- **Dashboard:** Painel principal para acompanhamento de métricas gerais e gráficos de desempenho.
+- **Clientes:** Listagem geral e cadastro de novos clientes.
+- **Animais:** Gestão de pets, com listagem e cadastro de novos animais.
+- **Serviços:** Listagem e registro de novos serviços prestados (como consultas, banho e tosa, etc).
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Como rodar o projeto
 
-## Learn More
+### Pré-requisitos
+Certifique-se de ter o [Bun](https://bun.sh/) instalado na sua máquina (ou Node.js com npm/yarn) e o [Docker](https://www.docker.com/) (opcional, para rodar via container).
 
-To learn more about Next.js, take a look at the following resources:
+### 💻 Em Desenvolvimento (Dev)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+1. Clone o repositório e acesse a pasta do projeto:
+   ```bash
+   git clone <url-do-repositorio>
+   cd zoota
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. Instale as dependências:
+   ```bash
+   bun install
+   ```
 
-## Deploy on Vercel
+3. Inicie o servidor de desenvolvimento:
+   ```bash
+   bun dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. Acesse [http://localhost:3000](http://localhost:3000) no seu navegador. O servidor será recarregado automaticamente ao salvar as alterações no código.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+### 🚀 Em Produção (Prod)
+
+Você pode rodar a versão otimizada de produção diretamente com o Bun ou utilizando Docker.
+
+#### Opção 1: Rodando nativamente
+
+1. Gere a build otimizada da aplicação:
+   ```bash
+   bun run build
+   ```
+
+2. Inicie o servidor de produção:
+   ```bash
+   bun start
+   ```
+
+#### Opção 2: Rodando com Docker (Recomendado)
+
+O projeto possui um `Dockerfile` otimizado em múltiplas etapas usando a funcionalidade *standalone* do Next.js e o Bun como base.
+
+1. Construa a imagem Docker:
+   ```bash
+   docker build -t zoota-app .
+   ```
+
+2. Inicie o container mapeando a porta:
+   ```bash
+   docker run -p 3000:3000 zoota-app
+   ```
+
+A aplicação estará disponível em [http://localhost:3000](http://localhost:3000).
