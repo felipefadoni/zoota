@@ -9,12 +9,15 @@ interface ServicoSelecionado {
   id: string;
   nome: string;
   valor: number;
+  animalId: string;
+  animalNome: string;
 }
 
 export default function NovoAtendimento() {
   const router = useRouter();
 
   const [servicoAtual, setServicoAtual] = useState("");
+  const [animalAtual, setAnimalAtual] = useState("");
   const [servicosList, setServicosList] = useState<ServicoSelecionado[]>([]);
 
   // Mock de serviços disponíveis
@@ -25,13 +28,32 @@ export default function NovoAtendimento() {
     { id: "4", nome: "Cirurgia Básica", valor: 800 },
   ];
 
+  // Mock de animais do cliente
+  const animaisDisponiveis = [
+    { id: "1", nome: "Rex (Cachorro)" },
+    { id: "2", nome: "Mimi (Gato)" },
+    { id: "3", nome: "Pé de Pano (Cavalo)" },
+    { id: "4", nome: "Mimosa (Vaca)" },
+  ];
+
   const handleAddServico = () => {
-    if (!servicoAtual) return;
+    if (!servicoAtual || !animalAtual) return;
 
     const servico = servicosDisponiveis.find((s) => s.id === servicoAtual);
-    if (servico) {
-      setServicosList([...servicosList, { ...servico, id: Date.now().toString() }]);
+    const animal = animaisDisponiveis.find((a) => a.id === animalAtual);
+
+    if (servico && animal) {
+      setServicosList([
+        ...servicosList,
+        {
+          ...servico,
+          id: Date.now().toString(),
+          animalId: animal.id,
+          animalNome: animal.nome,
+        },
+      ]);
       setServicoAtual("");
+      setAnimalAtual("");
     }
   };
 
@@ -90,23 +112,37 @@ export default function NovoAtendimento() {
           Serviços do Atendimento
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 2, mb: 3, alignItems: "flex-start" }}>
-          <TextField select fullWidth label="Selecione um Serviço" variant="outlined" value={servicoAtual} onChange={(e) => setServicoAtual(e.target.value)}>
-            {servicosDisponiveis.map((servico) => (
-              <MenuItem key={servico.id} value={servico.id}>
-                {servico.nome} - R$ {servico.valor.toFixed(2).replace(".", ",")}
-              </MenuItem>
-            ))}
-          </TextField>
-          <Button variant="contained" color="primary" onClick={handleAddServico} disabled={!servicoAtual} sx={{ height: 56, px: 4, borderRadius: "8px" }} startIcon={<FiPlusCircle />}>
-            Adicionar
-          </Button>
-        </Box>
+        <Grid container spacing={2} sx={{ mb: 3, alignItems: "flex-start" }}>
+          <Grid size={{ xs: 12, md: 5 }}>
+            <TextField select fullWidth label="Selecione um Animal" variant="outlined" value={animalAtual} onChange={(e) => setAnimalAtual(e.target.value)}>
+              {animaisDisponiveis.map((animal) => (
+                <MenuItem key={animal.id} value={animal.id}>
+                  {animal.nome}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid size={{ xs: 12, md: 5 }}>
+            <TextField select fullWidth label="Selecione um Serviço" variant="outlined" value={servicoAtual} onChange={(e) => setServicoAtual(e.target.value)}>
+              {servicosDisponiveis.map((servico) => (
+                <MenuItem key={servico.id} value={servico.id}>
+                  {servico.nome} - R$ {servico.valor.toFixed(2).replace(".", ",")}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid size={{ xs: 12, md: 2 }}>
+            <Button variant="contained" color="primary" onClick={handleAddServico} disabled={!servicoAtual || !animalAtual} fullWidth sx={{ height: 56, borderRadius: "8px" }} startIcon={<FiPlusCircle />}>
+              Adicionar
+            </Button>
+          </Grid>
+        </Grid>
 
         <TableContainer component={Paper} variant="outlined" sx={{ mb: 3 }}>
           <Table>
             <TableHead sx={{ backgroundColor: "rgba(0,0,0,0.02)" }}>
               <TableRow>
+                <TableCell>Animal</TableCell>
                 <TableCell>Serviço</TableCell>
                 <TableCell align="right">Valor</TableCell>
                 <TableCell align="center" width={100}>
@@ -117,13 +153,14 @@ export default function NovoAtendimento() {
             <TableBody>
               {servicosList.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={3} align="center" sx={{ py: 4, color: "text.secondary" }}>
+                  <TableCell colSpan={4} align="center" sx={{ py: 4, color: "text.secondary" }}>
                     Nenhum serviço adicionado ainda.
                   </TableCell>
                 </TableRow>
               ) : (
                 servicosList.map((servico) => (
                   <TableRow key={servico.id}>
+                    <TableCell>{servico.animalNome}</TableCell>
                     <TableCell>{servico.nome}</TableCell>
                     <TableCell align="right">R$ {servico.valor.toFixed(2).replace(".", ",")}</TableCell>
                     <TableCell align="center">
