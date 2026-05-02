@@ -47,7 +47,8 @@ export default function Recursos() {
           {/* Grid de Recursos Expandido */}
           <Box component="section" sx={{ py: { xs: 10, md: 16 } }}>
             <Container maxWidth="lg">
-              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 4 }}>
+              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" }, gap: 4 }}>
+                
                 <Card elevation={0} sx={{ backgroundColor: COLORS.white, borderRadius: "20px", border: `1px solid ${COLORS.border}` }}>
                   <CardContent sx={{ p: 5 }}>
                     <Box sx={{ width: 56, height: 56, backgroundColor: "rgba(197, 155, 118, 0.1)", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", color: COLORS.accent, mb: 4 }}>

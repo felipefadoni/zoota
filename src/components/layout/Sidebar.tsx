@@ -1,7 +1,7 @@
 import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FiActivity, FiFileText, FiHeart, FiHome, FiLogOut, FiSettings, FiUsers } from "react-icons/fi";
+import { FiActivity, FiCalendar, FiFileText, FiHeart, FiHome, FiLogOut, FiSettings, FiUsers } from "react-icons/fi";
 
 export const drawerWidth = 260;
 
@@ -10,6 +10,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { text: "Dashboard", icon: <FiHome />, path: "/app/dashboard" },
+    { text: "Agenda", icon: <FiCalendar />, path: "/app/agenda" },
     { text: "Clientes", icon: <FiUsers />, path: "/app/clientes" },
     { text: "Animais", icon: <FiHeart />, path: "/app/animais" },
     { text: "Serviços", icon: <FiActivity />, path: "/app/servicos" },
