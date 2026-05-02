@@ -39,12 +39,12 @@ export default function CreateAccount() {
           {/* Logo */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <title>ZootaPro Logo</title>
+              <title>ZooTa Logo</title>
               <path d="M6 4v10c0 3.314 2.686 6 6 6s6-2.686 6-6V9" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M6 4v5" stroke="white" strokeWidth="3" strokeLinecap="round" />
             </svg>
             <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.4rem", letterSpacing: "0.5px" }}>
-              ZootaPro
+              ZooTa
             </Typography>
           </Box>
 
@@ -107,7 +107,7 @@ export default function CreateAccount() {
             <Typography variant="body1" sx={{ color: "#e0eaff", fontSize: "1.1rem", lineHeight: 1.5 }}>
               Tenha uma intranet real em cima do seu ambiente
               <br />
-              Office 365, com o ZootaPro.
+              Office 365, com o ZooTa.
             </Typography>
           </Box>
 
@@ -134,12 +134,12 @@ export default function CreateAccount() {
           <Box sx={{ width: "100%", maxWidth: { xs: "100%", sm: "380px" }, display: "flex", flexDirection: "column" }}>
             <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center", gap: 1, mb: 4, color: "primary.main" }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <title>ZootaPro Logo Mobile</title>
+                <title>ZooTa Logo Mobile</title>
                 <path d="M6 4v10c0 3.314 2.686 6 6 6s6-2.686 6-6V9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M6 4v5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
               </svg>
               <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.4rem", letterSpacing: "0.5px", color: "primary.main" }}>
-                ZootaPro
+                ZooTa
               </Typography>
             </Box>
 
@@ -289,7 +289,7 @@ export default function CreateAccount() {
               1. Aceitação dos Termos
             </Typography>
             <Typography component="p" sx={{ fontSize: "0.95rem", color: "#666", mb: 2 }}>
-              Ao criar uma conta e usar a plataforma ZootaPro, você concorda em ficar vinculado a estes Termos e Condições. Se você não concordar com todos os termos e condições, então você não pode acessar o site ou usar quaisquer
+              Ao criar uma conta e usar a plataforma ZooTa, você concorda em ficar vinculado a estes Termos e Condições. Se você não concordar com todos os termos e condições, então você não pode acessar o site ou usar quaisquer
               serviços.
             </Typography>
 

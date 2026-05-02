@@ -1,7 +1,7 @@
 import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FiActivity, FiDollarSign, FiFileText, FiHeart, FiHome, FiLogOut, FiSettings, FiUsers } from "react-icons/fi";
+import { FiActivity, FiFileText, FiHeart, FiHome, FiLogOut, FiSettings, FiUsers } from "react-icons/fi";
 
 export const drawerWidth = 260;
 
@@ -14,7 +14,6 @@ export default function Sidebar() {
     { text: "Animais", icon: <FiHeart />, path: "/app/animais" },
     { text: "Serviços", icon: <FiActivity />, path: "/app/servicos" },
     { text: "Atendimentos", icon: <FiFileText />, path: "/app/atendimentos" },
-    { text: "Faturamentos", icon: <FiDollarSign />, path: "/app/faturamentos" },
     { text: "Configurações", icon: <FiSettings />, path: "/app/configuracoes" },
   ];
 
@@ -23,12 +22,12 @@ export default function Sidebar() {
       <Toolbar sx={{ backgroundColor: "transparent", color: "white" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <title>ZootaPro Logo</title>
+            <title>ZooTa Logo</title>
             <path d="M6 4v10c0 3.314 2.686 6 6 6s6-2.686 6-6V9" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M6 4v5" stroke="white" strokeWidth="3" strokeLinecap="round" />
           </svg>
           <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 600 }}>
-            ZootaPro
+            ZooTa
           </Typography>
         </Box>
       </Toolbar>

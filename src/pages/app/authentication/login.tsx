@@ -20,12 +20,12 @@ export default function Login() {
         {/* Logo */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <title>ZootaPro Logo</title>
+            <title>ZooTa Logo</title>
             <path d="M6 4v10c0 3.314 2.686 6 6 6s6-2.686 6-6V9" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M6 4v5" stroke="white" strokeWidth="3" strokeLinecap="round" />
           </svg>
           <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.4rem", letterSpacing: "0.5px" }}>
-            ZootaPro
+            ZooTa
           </Typography>
         </Box>
 
@@ -88,7 +88,7 @@ export default function Login() {
           <Typography variant="body1" sx={{ color: "#e0eaff", fontSize: "1.1rem", lineHeight: 1.5 }}>
             Tenha uma intranet real em cima do seu ambiente
             <br />
-            Office 365, com o ZootaPro.
+            Office 365, com o ZooTa.
           </Typography>
         </Box>
 
@@ -115,12 +115,12 @@ export default function Login() {
         <Box sx={{ width: "100%", maxWidth: { xs: "100%", sm: "380px" }, display: "flex", flexDirection: "column" }}>
           <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center", gap: 1, mb: 4 }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <title>ZootaPro Logo Mobile</title>
+              <title>ZooTa Logo Mobile</title>
               <path d="M6 4v10c0 3.314 2.686 6 6 6s6-2.686 6-6V9" stroke="#d86825" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M6 4v5" stroke="#d86825" strokeWidth="3" strokeLinecap="round" />
             </svg>
             <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.4rem", letterSpacing: "0.5px", color: "primary.main" }}>
-              ZootaPro
+              ZooTa
             </Typography>
           </Box>
 
