@@ -41,7 +41,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/src/backend/infra/postgres/schemas ./src/backend/infra/postgres/schemas
 
 # Instalar o drizzle-kit no runner para podermos rodar bunx drizzle-kit push
-RUN bun add drizzle-kit dotenv
+RUN bun add drizzle-orm drizzle-kit dotenv
 
 EXPOSE 3000
 
