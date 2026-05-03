@@ -37,7 +37,13 @@ RUN mkdir .next && \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copiar os schemas para o drizzle-kit conseguir ler
+COPY --from=builder --chown=nextjs:nodejs /app/src/backend/infra/postgres/schemas ./src/backend/infra/postgres/schemas
+
 USER nextjs
+
+# Instalar o drizzle-kit no runner para podermos rodar bunx drizzle-kit push
+RUN bun add drizzle-kit dotenv
 
 EXPOSE 3000
 
