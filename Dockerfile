@@ -29,6 +29,8 @@ RUN addgroup --system --gid 1001 nodejs && \
 
 COPY --from=builder /app/public ./public
 
+COPY drizzle.config.ts ./drizzle.config.ts
+
 RUN mkdir .next && \
     chown nextjs:nodejs .next
 
