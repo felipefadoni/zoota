@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:18.3
+    container_name: zoota_postgres
+    environment:
+      POSTGRES_USER: zoota
+      POSTGRES_PASSWORD: zoota123
+      POSTGRES_DB: zoota_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:4.3.0-management
+    container_name: zoota_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: zoota
+      RABBITMQ_DEFAULT_PASS: zoota123
+    ports:
+      - "5672:5672"   # Porta do protocolo AMQP
+      - "15672:15672" # Porta da interface de gerenciamento (UI)
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  rabbitmq_data:

@@ -1,3 +1,12 @@
+<!-- BEGIN:code-rules -->
+- Código em TypeScript
+- Escrito em Ingles
+- Não colocar comentários no código gerado
+- Não colocar código em português
+- As respostas da API devem ser em pt-br
+- Os interface ou types precisam estar dentro de um types.d.ts arquivo
+<!-- END:code-rules -->
+
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
@@ -177,3 +186,171 @@ It contains comprehensive guides, components, and utilities for building user in
 - Vamos ter uma tela de Faturamentos
 - Vamos ter uma tela de Configurações
 <!-- END:system-rules -->
+
+<!-- BEGIN:system-bounded-context -->
+# Bounded Contexts (Contextos Delimitados) - Backend Zoota
+
+Com base na análise das interfaces, fluxos de usuário e interligações de dados do front-end (`src/pages/app`), a arquitetura do backend deve ser modelada seguiring os princípios de Domain-Driven Design (DDD). O sistema Zoota é focado na gestão veterinária e de fazendas.
+
+Abaixo estão os **Bounded Contexts** identificados, os domínios que eles encapsulam e as justificativas técnicas (motivos) para essa separação.
+
+---
+
+## 1. Contexto de Identidade e Acesso (Identity & Access Context)
+
+**Responsabilidade:** Gerenciar quem usa o sistema e o que eles podem fazer. É a porta de entrada da aplicação.
+**Módulos de UI Correspondentes:** `/authentication`, `/configuracoes` (aba Dados de Cadastro).
+**Entidades Principais (Aggregates):**
+*   `User` (Usuário logado/Veterinário/Gestor)
+*   `Tenant` / `Clinic` (A clínica veterinária ou empresa contratante, base para isolamento de dados/multi-tenancy)
+*   `Role` / `Permission` (Controle de acesso)
+
+**Motivos para criação deste contexto:**
+*   **Isolamento de Segurança:** Regras de autenticação (JWT, OAuth), hash de senhas e recuperação de contas mudam por motivos de segurança, não de negócio.
+*   **Multi-tenancy:** O sistema atende clínicas. Todo dado gerado no sistema (clientes, animais, atendimentos) deve pertencer a um `Tenant` (a clínica). O contexto de identidade é quem emite o token que garante o escopo (Tenant ID) para as requisições subsequentes.
+
+---
+
+## 2. Contexto de Relacionamento (CRM Context)
+
+**Responsabilidade:** Gerenciar o cadastro das entidades pagadoras e locais de atendimento (Fazendas).
+**Módulos de UI Correspondentes:** `/clientes`.
+**Entidades Principais (Aggregates):**
+*   `Customer` (Cliente / Fazenda / Proprietário)
+*   `Address` (Localização, UF)
+*   `Contact` (Telefones, E-mails)
+
+**Motivos para criação deste contexto:**
+*   **Independência do Pagador:** Um cliente pode existir sem ter animais cadastrados (fase de prospecção) ou sem ter atendimentos gerados.
+*   **Foco em Dados Cadastrais:** As regras de validação aqui são estáticas (validar CPF/CNPJ, CEP, formatação de telefone), não dependendo de lógicas veterinárias. Este contexto será amplamente consultado por outros.
+
+---
+
+## 3. Contexto Clínico / Prontuário (Clinical Context)
+
+**Responsabilidade:** Gerenciar os pacientes (animais/rebanhos) e o histórico clínico básico.
+**Módulos de UI Correspondentes:** `/animais`.
+**Entidades Principais (Aggregates):**
+*   `Animal` / `Patient` (Identificação, Raça, Categoria: Bovino/Equino/etc)
+*   `Ownership` (O vínculo entre o Animal e o Cliente do contexto de CRM)
+
+**Motivos para criação deste contexto:**
+*   **Linguagem Ubíqua Específica:** As regras que governam um "Animal" (categorias, raças, status vital) são exclusivas da medicina veterinária e zootecnia.
+*   **Relação de Dependência:** Embora o Animal dependa de um Cliente (Owner), o ciclo de vida do Animal (ficar doente, morrer, ser vendido) é distinto do ciclo de vida do Cliente (mudar de endereço, inativar contrato). Separar evita um "Deus-Objeto" (God Object) no Cliente.
+
+---
+
+## 4. Contexto de Operações e Faturamento (Operations & Billing Context)
+
+**Responsabilidade:** É o "Core Domain" financeiro. Gerencia o que a clínica faz (Serviços) e a execução/faturamento disso (Atendimentos).
+**Módulos de UI Correspondentes:** `/servicos`, `/atendimentos`, `/configuracoes` (aba Dados Bancários).
+**Entidades Principais (Aggregates):**
+*   `CatalogService` (Serviços oferecidos e precificação base)
+*   `Attendance` / `Invoice` (O atendimento prestado / Fatura gerada)
+*   `AttendanceItem` (Linha do atendimento vinculando um Serviço, valor cobrado e o Animal específico)
+*   `BankAccount` (Dados para recebimento do Tenant)
+
+**Motivos para criação deste contexto:**
+*   **Complexidade Transacional:** A UI de "Novo Atendimento" exige forte consistência transacional. É aqui que unimos `Customer` (CRM), `Animal` (Clinical) e `CatalogService` (Operations).
+*   **Imutabilidade Financeira:** Se o preço de um `CatalogService` for alterado no futuro (ex: Vacina subiu de R$80 para R$100), o `Attendance` passado não pode sofrer alteração. Ele guarda um *snapshot* do valor no momento da execução.
+*   **Regras de Carrinho e Totalização:** A lógica do `reduce()` vista no front-end para calcular o "Valor Total" deve ser garantida e validada no backend neste contexto.
+
+---
+
+## 5. Contexto de Agendamento (Scheduling Context)
+
+**Responsabilidade:** Controle temporal de compromissos da clínica.
+**Módulos de UI Correspondentes:** `/agenda`.
+**Entidades Principais (Aggregates):**
+*   `Appointment` (Agendamento, Data/Hora, Motivo)
+*   `ScheduleStatus` (Agendado, Concluído, Atrasado, Cancelado)
+
+**Motivos para criação deste contexto:**
+*   **Regras de Conflito de Tempo:** Este contexto precisa garantir que não haja *double-booking* (dois agendamentos no mesmo horário para o mesmo veterinário, caso exista a entidade no futuro) ou calcular o tempo de deslocamento até uma fazenda.
+*   **Separação do Faturamento:** Um agendamento (`Appointment`) *não* é um atendimento (`Attendance`). Um agendamento pode ser cancelado sem impacto financeiro. O ciclo de vida temporal é diferente do ciclo de vida de faturamento.
+
+---
+
+## 6. Contexto de Análise de Dados (Analytics / Reporting Context)
+
+**Responsabilidade:** Fornecer dados agregados, KPIs e séries temporais para tomada de decisão.
+**Módulos de UI Correspondentes:** `/dashboard`.
+**Entidades Principais (Aggregates):**
+*   *Views e Projections* (Dados read-only consolidados, como "Faturamento Mensal", "Contagem de Clientes", "Top Serviços").
+
+**Motivos para criação deste contexto:**
+*   **CQRS (Command Query Responsibility Segregation):** O dashboard precisa de dados consolidados (somas, agrupamentos por mês). Fazer essas *queries* pesadas diretamente nos bancos de dados transacionais dos contextos de *Operations* ou *CRM* degrada a performance do sistema de cadastro.
+*   **Otimização de Leitura:** O ideal é que eventos dos outros contextos (ex: `AttendanceCreated`, `CustomerRegistered`) alimentem uma base de leitura otimizada para o dashboard, permitindo que os gráficos (Recharts) carreguem instantaneamente.
+
+---
+
+## Mapa de Integração (Context Map - Resumo)
+
+*   O **Identity Context** envelopa todos os outros (fornece o `TenantId` em todas as rotas).
+*   O **Scheduling Context** faz referência a IDs do **CRM Context** (Cliente) e **Clinical Context** (Animal).
+*   O **Operations Context** (Atendimentos) é o maior consumidor: ele precisa ler dados do **CRM Context**, **Clinical Context** e de si mesmo (`CatalogService`) para gerar a Fatura.
+*   O **Analytics Context** é puramente reativo (assíncrono ou através de views de banco de dados), escutando o que acontece nos outros contextos para montar o Dashboard.
+<!-- END:system-bounded-context -->
+
+<!-- BEGIN:system-description -->
+# Documentação de UX/UI e Arquitetura do Sistema - Módulos Internos (`src/pages/app`)
+
+Este documento mapeia a experiência do usuário (UX), a interface de usuário (UI), a arquitetura de dados e como os módulos da aplicação Zoota (localizados em `src/pages/app`) se interligam. O sistema foi projetado para ser um painel de controle (Dashboard) focado na gestão veterinária e de fazendas.
+
+## 1. Visão Arquitetural e Padrões de UX/UI
+
+A aplicação utiliza o ecossistema **Next.js (Pages Router)**, **React** e **Material-UI (MUI v5)**, focando em uma experiência de Single Page Application (SPA).
+
+*   **Consistência Visual (Design System):** A interface adota um estilo "flat" moderno. Os componentes (como `Card`) utilizam `elevation={0}`, bordas sólidas (`1px solid #e0e0e0`) e cantos arredondados (`borderRadius: "12px" / "14px"`). O espaçamento é padronizado (ex: `spacing={3}` nas Grids).
+*   **Layout Unificado:** O usuário é mantido em um contexto contínuo através dos wrappers `AppLayout` (que provê a Sidebar de navegação e a Topbar) e `PageHeader` (que padroniza os títulos, descrições e botões de ação principal de cada página).
+*   **Ações de Tabela (Row Actions):** O padrão para interagir com itens em listas (editar, excluir, visualizar) é o uso de um ícone de três pontos verticais (`FiMoreVertical`) que abre um menu contextual suspenso, mantendo a interface limpa e focada nos dados.
+*   **Navegação Fluida:** Transições de tela são feitas de forma programática usando `useRouter` (ex: botões de "Voltar" ou "Novo Registro"), evitando recarregamentos completos da página e garantindo a sensação de um aplicativo nativo.
+
+## 2. Detalhamento das Páginas, Dados e Fluxos
+
+### 2.1 Dashboard (`/dashboard/index.tsx`)
+**O que faz:** É a tela inicial pós-login. Atua como um "Hub" de informações, dando ao gestor/veterinário um panorama rápido da saúde financeira e operacional do negócio.
+**Dados Exibidos:**
+*   **Métricas Chave (KPIs):** Faturamento Total, Total Recebido, A Receber, Atendimentos Realizados, Total de Clientes e Total de Animais.
+*   **Gráficos:** Faturamento dos últimos 6 meses (Gráfico de Barras) e Serviços mais prestados (Gráfico de Rosca/Donut).
+**Interligação:** Os dados apresentados aqui são um consolidado (agregação) das informações geradas nos módulos de **Atendimentos**, **Clientes**, **Animais** e **Serviços**.
+
+### 2.2 Agenda (`/agenda/index.tsx`)
+**O que faz:** Organiza os compromissos futuros e passados (consultas, retornos, vacinações).
+**Dados Exibidos:** Data, Horário, Cliente/Propriedade, Animal atendido, Motivo da visita e Status (Agendado, Concluído, Atrasado).
+**Interligação:** Conecta-se visual e logicamente com **Clientes** (para saber onde ir) e **Animais** (quem será atendido). O status visual (`StatusChip`) ajuda na triagem rápida do dia.
+
+### 2.3 Clientes (`/clientes`)
+**O que faz:** Gerencia o cadastro das entidades contratantes (Fazendas, Haras, Proprietários pessoa física). É a base do relacionamento.
+**Dados Exibidos:**
+*   *Lista:* Nome da Fazenda/Cliente, Proprietário, Localização e Status (Ativo/Inativo/Pendente).
+*   *Formulário (`novo.tsx`):* Dados completos de cadastro, incluindo endereço com seleção de UF.
+**Interligação:** É a entidade "Pai". Sem um cliente, não é possível cadastrar um **Animal** nem gerar um **Atendimento** ou **Agenda**.
+
+### 2.4 Animais (`/animais`)
+**O que faz:** Cadastro e prontuário dos pacientes ou rebanhos.
+**Dados Exibidos:** Identificação (Nome/Brinco), Raça, Categoria (Bovino, Equino, Canino, Felino), Status e, crucialmente, o Proprietário/Fazenda.
+**Interligação:** É uma entidade "Filha" de **Clientes**. O cadastro de um animal exige a vinculação a um proprietário. Eles são os alvos principais nas telas de **Agenda** e **Atendimentos**.
+
+### 2.5 Serviços (`/servicos`)
+**O que faz:** Define o catálogo de produtos e procedimentos oferecidos pela clínica, padronizando a precificação.
+**Dados Exibidos:** Título (ex: Consulta, Vacina), Descrição, Valor Base e Status.
+**Interligação:** Atua como um dicionário de preços. Os itens cadastrados aqui são consumidos pelo módulo de **Atendimentos** para gerar o valor total a ser cobrado.
+
+### 2.6 Atendimentos (`/atendimentos`)
+**O que faz:** É o coração financeiro e operacional do sistema. Registra a prestação de serviço, unindo "Quem pagou", "Quem foi atendido" e "O que foi feito".
+**Dados Exibidos:**
+*   *Lista:* Número da Fatura (ex: FAT-001), Data, Cliente, Quantidade de Serviços, Valor Total e Status de Pagamento (Pago, Pendente, Atrasado).
+*   *Formulário de Novo Atendimento (`novo.tsx`):*
+    *   **UX de Seleção em Cascata:** O usuário seleciona um **Cliente**. Ao fazer isso, o sistema filtra a lista de **Animais** para mostrar *apenas* os pertencentes àquele cliente. Se o cliente for trocado, a seleção do animal é resetada para evitar inconsistências de dados.
+    *   **Carrinho de Serviços:** O usuário adiciona múltiplos **Serviços** (com seus respectivos valores) a uma lista. O sistema calcula o *Valor Total* dinamicamente.
+**Interligação:** É o ponto de convergência de todos os outros módulos. Consome dados de **Clientes** (pagador), **Animais** (paciente) e **Serviços** (itens faturados), alimentando futuramente os gráficos do **Dashboard**.
+
+### 2.7 Configurações (`/configuracoes/index.tsx`)
+**O que faz:** Permite o ajuste das informações da própria clínica ou do usuário logado.
+**UX de Navegação:** Utiliza um sistema de Abas (Tabs) para separar "Dados de Cadastro" (informações pessoais, alteração de senha) de "Dados da Conta" (informações bancárias). A transição de abas ocorre instantaneamente via controle de estado (`useState`), sem mudar de página, oferecendo uma experiência fluida.
+
+### 2.8 Autenticação (`/authentication`)
+**O que faz:** Controla o acesso ao sistema.
+**UX:** Diferente do resto da aplicação, este módulo *não* utiliza o `AppLayout`. Ele possui um design focado na conversão e segurança (telas limpas, focadas no formulário de login, criação de conta ou recuperação de senha), garantindo que o usuário não se distraia antes de entrar no sistema.
+<!-- END:system-description -->
