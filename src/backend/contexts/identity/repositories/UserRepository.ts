@@ -11,12 +11,12 @@ export class UserRepository implements IUserRepository {
 
   async findById(id: string): Promise<User | null> {
     const [record] = await this.dbRead.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
-    return record;
+    return record || null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const [record] = await this.dbRead.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
-    return record;
+    return record || null;
   }
 
   async create(user: User, passwordHash: string): Promise<void> {

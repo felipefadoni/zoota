@@ -1,4 +1,5 @@
 import type { NextApiResponse } from "next";
+import z from "zod";
 import { BadRequestError } from "./BadRequest.error";
 import { MethodNotAllowedStatus } from "./method-not-allowed.status";
 import { NotAuthorizedError } from "./not-authorized.error";
@@ -7,6 +8,8 @@ import { NotFoundError } from "./not-found.error";
 export async function wrapError<T>(error: T, res: NextApiResponse) {
   if (error instanceof NotFoundError || error instanceof MethodNotAllowedStatus || error instanceof NotAuthorizedError || error instanceof BadRequestError)
     return res.status(error.statusCode).json({ code: error.statusCode, timestamp: new Date().toISOString(), message: error.message });
+
+  if (error instanceof z.ZodError) return res.status(400).json({ message: error.flatten().fieldErrors });
 
   if (error instanceof Error) return res.status(500).json({ message: error.message });
 

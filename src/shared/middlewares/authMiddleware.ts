@@ -1,3 +1,5 @@
+import type { UserAuthenticated } from "@/backend/contexts/identity/types";
+import jwt from "jsonwebtoken";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export interface AuthenticatedRequest extends NextApiRequest {
@@ -15,15 +17,13 @@ export function withAuth(handler: (req: AuthenticatedRequest, res: NextApiRespon
     if (!authHeader?.startsWith("Bearer ")) return res.status(401).json({ message: "Acesso negado. Token não fornecido ou formato inválido." });
 
     const token = authHeader.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "Acesso negado. Token não fornecido ou formato inválido." });
 
-    if (token !== "fake-jwt-token-123456789") return res.status(401).json({ message: "Acesso negado. Token inválido ou expirado." });
+    const jwtSecret = process.env.JWT_SECRET!;
 
-    req.user = {
-      id: "usr_123",
-      email: "teste@email.com",
-      role: "admin",
-    };
+    const decoded = jwt.verify(token, jwtSecret) as UserAuthenticated;
 
+    req.user = decoded;
     return handler(req, res);
   };
 }

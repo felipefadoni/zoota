@@ -1,6 +1,6 @@
 import { NotFoundError } from "@/shared/status/not-found.error";
 import type { IUserRepository } from "../../repositories/interfaces/i-user-repository";
-import type { GetUserInfoUseCaseInput } from "../types.input";
+import type { GetUserInfoUseCaseInput } from "./types.input";
 
 export class GetUserInfoUseCase {
   constructor(private userRepository: IUserRepository) {}
